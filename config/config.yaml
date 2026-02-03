@@ -1,0 +1,44 @@
+# ============================================================
+# MindMetrics — Central Configuration
+# Edit values here, never hardcode them in scripts.
+# ============================================================
+
+# ─── Paths ────────────────────────────────────────────────
+paths:
+  raw_data:       "data/raw/STREL_raw.csv"
+  processed_dir:  "data/processed/"
+  results_dir:    "results/"
+  models_dir:     "results/models/"
+  plots_dir:      "results/plots/"
+
+# ─── Reproducibility ──────────────────────────────────────
+random_seed: 42
+
+# ─── Cross-Validation ────────────────────────────────────
+cv:
+  n_folds: 3                 # 3-fold person-based CV
+  participants_per_fold: 8   # 24 total / 3 folds
+
+# ─── Target ───────────────────────────────────────────────
+target_column: "NHR_Stress"  # Binary: "S" (stressed) / "NS" (not stressed)
+
+# ─── Feature Groups (for quick enable/disable) ───────────
+features:
+  physiological:  ["HR", "RR", "HR_Baseline", "HR_Normalized", "PNSindex", "SNSindex", "Stressindex"]
+  motion:         ["Cadence", "Speed"]
+  psychometric:   ["N_MD", "N_PD", "N_TD", "N_P", "N_E", "N_F"]
+  personality:    ["Extraversion", "Agreeableness", "Conscientiousness", "Neuroticism", "Openness"]
+  demographic:    ["Age", "BMI"]
+  categorical:    ["Day", "Period", "Profession", "Activity4"]   # will be one-hot encoded
+
+# ─── Stress Thresholds (from paper) ──────────────────────
+thresholds:
+  nhr_stress_sd:      2      # NHR > 2 SD above baseline = stressed
+  sns_stress_cutoff:  1.0    # SNS Index > 1 = stressed
+
+# ─── PyTorch (SVM) ────────────────────────────────────────
+pytorch:
+  device: "auto"             # "auto" | "cpu" | "cuda"
+  epochs: 100
+  learning_rate: 0.01
+  batch_size: 64

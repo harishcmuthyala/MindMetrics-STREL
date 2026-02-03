@@ -1,0 +1,20 @@
+# ─── Core ─────────────────────────────────────────
+pandas
+numpy
+scikit-learn
+pyyaml
+jupyter
+
+# ─── Visualization ───────────────────────────────
+matplotlib
+seaborn
+
+# ─── PyTorch (SVM) ───────────────────────────────
+# Install separately — pick the version matching your CUDA setup:
+#   CPU only:  pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   CUDA 12.1: pip install torch --index-url https://download.pytorch.org/whl/cu121
+torch
+
+# ─── Added later ──────────────────────────────────
+# xgboost          ← add in Week 5 when P3 starts XGBoost training
+# joblib           ← add in Week 9 when saving the final model
