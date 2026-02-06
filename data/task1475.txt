@@ -1,0 +1,7 @@
+Everyone: 
+"Participant","Date","Time","Day","subDC","Period","Profession","Age","Gender","BMI"
+
+
+
+Individual:
+"HR","RR","Cadence","Speed","PNSindex","SNSindex","Stressindex","HR_Baseline","HR_Normalized"
