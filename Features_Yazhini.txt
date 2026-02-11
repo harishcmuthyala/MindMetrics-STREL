@@ -1,0 +1,278 @@
+STREL – Naturalistic Dataset and Methods for Studying Mental Stress and Relaxation Patterns in Critical Leading Roles
+
+Mental stress in emergency care leaders and special police leaders
+
+
+(1) Participant:
+
+The STREL study recruited 25 volunteers under an approved ethics protocol (ERCIC 535 24 02 2024), with 24 completing the study.
+Participants included:
+
+14 Emergency Care (EC) leaders (Netherlands)
+
+10 Special Police (SP) leaders (Switzerland)
+
+Each participant was assigned a unique ID (e.g., T001).
+
+
+At the end of each day, the experimenter debriefed
+the participants, extracting an account of what transpired
+during the day, noting stressful events, happy moments,
+and relaxation periods.
+
+(2) Date:
+
+Data was collected across four days per participant:
+
+One Critical Day (CD)
+
+Two Workdays (WD1, WD2)
+
+One Non-Workday (ND)
+
+
+(3) Time:
+
+Data was summarized into 5-minute intervals instead of second-by-second recordings.
+
+Example:
+
+06:30–06:35
+
+06:35–06:40
+
+Each row in the dataset represents one 5-minute window.
+
+(4) Day:
+
+Day indicates the type of day:
+
+CD = Critical Workday
+
+WD1 / WD2 = Normal Workdays
+
+ND = Non-Workday
+
+
+(5) subDC (Sub Distress Condition)
+
+subDC categorizes each 5-minute interval into a more detailed condition within the day type.
+
+It helps distinguish contextual differences such as:
+
+HR = 110 bpm during running → physical activity (not mental stress)
+
+HR = 110 bpm while sitting during crisis → mental stress
+
+subDC provides contextual awareness to correctly interpret physiological signals.
+
+
+(6) Period:
+
+Time of day is divided into:
+
+Morning (MRN)
+
+Afternoon (AFN)
+
+This helps analyze whether stress increases or decreases throughout the day.
+
+(7) Profession:
+
+Two categories:
+
+EC = Emergency Care leaders
+
+SP = Special Police leaders
+
+(8) Age:
+
+Participant’s age in years.
+
+(9) Gender
+
+Participant’s biological sex (M/F).
+
+(10) BMI:
+
+Body Mass Index.
+Important because high BMI can influence heart rate patterns and affect stress labeling.
+BMI is used as a covariate to control physiological differences.
+
+Individual:
+
+(1) SNS_Stress:
+
+SNS = Sympathetic Nervous System Index.
+It is calculated from HRV(Heart Rate Variability) using Kubios software.
+
+Rule:
+
+If SNSindex > 1 → SNS_Stress = 1 (Stress)
+
+If SNSindex ≤ 1 → SNS_Stress = 0 (No Stress)
+
+This converts continuous SNS values into a binary stress label.
+
+Example:
+For Participant T001:
+SNSindex = 0.4762
+Threshold = 1
+→ SNS_Stress = 0 (Not Stressed)
+
+(2) SNS_S:
+
+Number of stressed intervals where SNSindex > 1.
+
+Example:
+If there are 100 five-minute windows and 35 exceed threshold:
+SNS_S = 35
+
+(3) SNS_NS:
+
+Number of non-stressed intervals where SNSindex ≤ 1.
+
+If:
+Total windows = 100
+SNS_S = 35
+
+Then:
+SNS_NS = 65
+
+SNS_S + SNS_NS = Total intervals
+
+(4) SNSindexThreshold:
+It converts a continuous SNS value into binary stress.
+
+Threshold = 1
+
+
+(5), (6), (7):
+
+NASA Task Load Index (NASA-TLX): Used as a subjective predictor in naturalistic stress studies because it can provide clues about the
+source of observed stress (e.g. time pressure) 
+From each participant, they received daily scores for the NASA-TLX six subscales(score range [1 − 20]):
+
+• Mental Demand (NASAMD/ N_MD): Perception of daily mental load 
+• Physical Demand (NASAPD/ N_PD): Perception of daily physical exertion 
+• Temporal Demand (NASATD/ N_TD): Perception of daily time pressure 
+• Performance (NASAP ): Perception of success in executing daily tasks 
+• Effort (NASAE): Perceived amount of work expended to achieve said daily performance
+• Frustration (NASAF ): Perceived level of irritation in performing daily tasks
+
+
+
+
+
+
+OVERALL CONTEXT OF THE STUDY: 
+
+The STREL dataset was designed to study mental stress in real-world leadership roles.
+
+- Data collected included:
+
+Heart Rate (HR)
+
+Heart Rate Variability (HRV)
+
+Motion (cadence, speed)
+
+GPS
+
+Sleep data
+
+NASA-TLX workload scores
+
+Big Five personality traits
+
+Biographic data
+
+
+Devices used:
+
+Polar Vantage V2 smartwatch
+
+Polar H10 chest strap
+Recording at high resolution (1000 Hz).
+
+
+Main goal:
+Detect mental stress (distress) and positive stress (eustress) in naturalistic environments while separating:
+
+Physical stress
+
+Mental stress
+
+
+Stress labeling methods:
+They created stress labels using:
+
+NHR (Normalized Heart Rate):
+Stress = HR_Normalized > 2 × standard deviation from baseline
+
+SNS Index method (threshold = 1)
+
+
+
+
+EXTRA NOTES/INFO FROM PAPER:
+
+Participants had to complete trait and
+state questionnaires that were implemented in QualtricsXM.
+
+Participants also received a Polar Vantage V2 smartwatch +
+H10 chest strap combo -  had to wear these devices for
+the four days of observation, including in their sleep. 
+The devices were recording geographic, motion, physiological,
+and sleep information at high resolution (1000 Hz).
+
+Participants had to complete the biographic questionnaire once - information about the participant’s 
+occupation, age, sex, family status, and body mass index (BMI).
+
+The family status of the participants, especially whether they had
+preteen children or not, it was important to gain insight into
+their activities during non-work periods. 
+
+The BMI of the participants was a covariate of interest because a high BMI
+can play a confounding role in cardiac recordings (meaning High BMI affects heart rate patterns), which used for stress labeling. 
+The research team also had information about the location of the home and workplace
+of the participants, which helped validate the activities of
+the participants by cross-referencing the reported locations
+with the logged coordinates.
+
+Participants had to complete the Big
+Five Inventory once - The Big Five Inventory measures personality
+along five dimensions:
+• Agreeableness (B5A): The level of friendliness of the
+participant with the score range [2, 10].
+• Conscientiousness (B5C ): The level of organized nature
+of the participant with the score range [2, 10].
+• Extraversion (B5E): The level of the outgoing nature of
+the participant with the score range [2, 10].
+• Neuroticism (B5N ): The level of nervousness of the
+participant with the score range [2, 10].
+• Openness (B5O): The level of curiosity of the
+participant with the score range [2, 10].
+
+
+Geographic, Motion, Physiological, and Sleep Data: 
+In terms of geographic information - the Vantage V2 watch recorded the GPS coordinates. 
+Hence, the GPS channel provided the location of the participant over time.
+
+In terms of motion information - the device recorded the cadence and speed. 
+The combination of geographic and motion information was used to validate the differentiation 
+of physical from nonphysical activities on the move.
+
+In terms of physiological information - the Polar H10 chest strap recorded HRV, HR, and daily HR baselines. 
+We used HR signals and HR baselines to compute stress labels during sedentary activities. 
+
+In parallel, we fed HRV signals to the Kubios software to calculate the Sympathetic Nervous System (SNS) Index and
+the Stress Index (SI) for developing an alternative set of stress labels - and used this alternative set of stress labels as
+a benchmark against our HR-baseline-based stress labeling method. 
+
+Sleep times were determined using physiological analytics provided by 
+the Kubios software and participantreported sleep times.
+
+
+
+
