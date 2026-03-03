@@ -15,9 +15,6 @@ from sklearn.metrics import (
 import warnings
 warnings.filterwarnings("ignore")
 
-# ─────────────────────────────────────────────
-# CONFIG
-# ─────────────────────────────────────────────
 TRAIN_PATH = "data/processed/train.xlsx"
 TEST_PATH  = "data/processed/test.xlsx"
 DROP_COLS  = ["Participant", "PA_Activity", "SNS_Stress"]
@@ -25,9 +22,6 @@ CAT_COLS   = ["Day", "Period", "Profession", "Gender", "Activity4"]
 TARGET     = "NHR_Stress"
 
 
-# ─────────────────────────────────────────────
-# PREPROCESSING FUNCTION
-# ─────────────────────────────────────────────
 def preprocess(df, scaler=None, fit=True):
     """
     Preprocess data: drop columns, encode categoricals, scale features.
@@ -67,18 +61,14 @@ def preprocess(df, scaler=None, fit=True):
     return X_train_df, y_train, scaler
 
 
-# ─────────────────────────────────────────────
-# MAIN TRAINING FUNCTION
-# ─────────────────────────────────────────────
 def train_svm():
     """
     Train Linear SVM and evaluate on test data.
     Returns a results dict matching the team pipeline format.
     """
 
-    # ─────────────────────────────────────────────
     # STEP 1: LOAD DATA
-    # ─────────────────────────────────────────────
+
     print("=" * 60)
     print("STEP 1: Loading Data")
     print("=" * 60)
@@ -89,9 +79,9 @@ def train_svm():
     print(f"Train shape : {train_df.shape}")
     print(f"Test shape  : {test_df.shape}")
 
-    # ─────────────────────────────────────────────
+  
     # STEP 2: PREPROCESSING
-    # ─────────────────────────────────────────────
+
     print("\n" + "=" * 60)
     print("STEP 2: Preprocessing")
     print("=" * 60)
@@ -104,9 +94,9 @@ def train_svm():
     print(f"Train class balance — Stress: {y_train.sum()} | No Stress: {(y_train == 0).sum()}")
     print(f"Test class balance  — Stress: {y_test.sum()}  | No Stress: {(y_test == 0).sum()}")
 
-    # ─────────────────────────────────────────────
+ 
     # STEP 3: TRAINING
-    # ─────────────────────────────────────────────
+
     print("\n" + "=" * 60)
     print("STEP 3: Training SVM")
     print("=" * 60)
@@ -118,9 +108,9 @@ def train_svm():
     model.fit(X_train, y_train)
     print(f"Training complete — kernel: linear | C: 1.0")
 
-    # ─────────────────────────────────────────────
+
     # STEP 4: EVALUATION
-    # ─────────────────────────────────────────────
+
     print("\n" + "=" * 60)
     print("STEP 4: Evaluation")
     print("=" * 60)
@@ -152,7 +142,7 @@ def train_svm():
     print("\nConfusion Matrix:")
     print(pd.DataFrame(cm, index=label_names, columns=label_names))
 
-    # Return results dict — matches team pipeline format for model comparison
+
     return {
         "model_name" : "SVM",
         "accuracy"   : acc,
