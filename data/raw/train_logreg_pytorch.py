@@ -9,48 +9,50 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    confusion_matrix,
+)
 
-
-
-# 1) Paths 
-BASE_DIR = Path(__file__).resolve().parent  # data/raw
+# 1) Paths (works from VS Code Run button)
+BASE_DIR = Path(__file__).resolve().parent  # points to data/raw
 TRAIN_PATH = BASE_DIR / "train.xlsx"
 TEST_PATH = BASE_DIR / "test.xlsx"
 
-# 2) Target column
+# 2) Target column and required drop columns
 TARGET_COL = "NHR_Stress"  # values: NS / S
+
+
+DROP_COLS = ["Participant", "PA_Activity", "SNS_Stress"]
 
 
 def load_and_prepare(path: Path):
     df = pd.read_excel(path)
 
-    # Drop rows with missing target
+    # Keep rows where target exists
     df = df.dropna(subset=[TARGET_COL]).copy()
 
-    # Map target to 0/1
+    # Map target labels to 0/1
     df[TARGET_COL] = df[TARGET_COL].map({"NS": 0, "S": 1})
     df = df.dropna(subset=[TARGET_COL]).copy()
     df[TARGET_COL] = df[TARGET_COL].astype(int)
 
-    # Drop leakage + ID columns (avoid cheating / non-informative)
-    leakage_cols = ["NHR_S", "NHR_NS", "SNS_S", "SNS_NS"]
-    id_cols = ["Participant", "Date", "Time"]
+    # Drop ONLY specified columns (and then separate X/y)
+    df = df.drop(columns=DROP_COLS, errors="ignore")
 
-    # Also drop other stress label if present (so it doesn't leak signal)
-    other_label_cols = ["SNS_Stress"]
-
-    drop_cols = [c for c in (leakage_cols + id_cols + other_label_cols) if c in df.columns]
-    df = df.drop(columns=drop_cols, errors="ignore")
-
-    # Split X/y
     y = df[TARGET_COL].copy()
-    X = df.drop(columns=[TARGET_COL]).copy()
+    X = df.drop(columns=[TARGET_COL], errors="ignore").copy()
 
     return X, y
 
 
+
 # 3) Load train/test
+
 X_train_raw, y_train = load_and_prepare(TRAIN_PATH)
 X_test_raw, y_test = load_and_prepare(TEST_PATH)
 
@@ -58,7 +60,9 @@ print("Train raw shape:", X_train_raw.shape, "Target counts:", y_train.value_cou
 print("Test raw shape :", X_test_raw.shape, "Target counts:", y_test.value_counts().to_dict())
 
 
+
 # 4) Preprocessing: impute + encode + scale
+
 cat_cols = X_train_raw.select_dtypes(include=["object", "category", "bool", "string"]).columns.tolist()
 num_cols = [c for c in X_train_raw.columns if c not in cat_cols]
 
@@ -83,13 +87,14 @@ preprocess = ColumnTransformer(
 X_train = preprocess.fit_transform(X_train_raw)
 X_test = preprocess.transform(X_test_raw)
 
-# Convert sparse matrices to dense arrays if needed
+# Convert sparse -> dense if needed
 if hasattr(X_train, "toarray"):
     X_train = X_train.toarray()
     X_test = X_test.toarray()
 
 print("After preprocessing:")
 print("X_train:", X_train.shape, "X_test:", X_test.shape)
+
 
 
 # 5) Convert to PyTorch tensors
@@ -101,7 +106,9 @@ X_test_t = torch.tensor(X_test, dtype=torch.float32)
 y_test_t = torch.tensor(y_test.values, dtype=torch.float32).view(-1, 1)
 
 
+
 # 6) Logistic Regression Model (PyTorch)
+
 class LogisticRegression(nn.Module):
     def __init__(self, n_features: int):
         super().__init__()
@@ -116,7 +123,9 @@ criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
 
 
+
 # 7) Training loop
+
 EPOCHS = 50
 
 for epoch in range(1, EPOCHS + 1):
@@ -133,11 +142,13 @@ for epoch in range(1, EPOCHS + 1):
         print(f"Epoch {epoch:>3} | Loss: {loss.item():.4f}")
 
 
+
 # 8) Evaluation
+
 model.eval()
 with torch.no_grad():
     logits_test = model(X_test_t)
-    probs = torch.sigmoid(logits_test).numpy().ravel()
+    probs = torch.sigmoid(logits_test).cpu().numpy().ravel()
     preds = (probs >= 0.5).astype(int)
 
 acc = accuracy_score(y_test, preds)
