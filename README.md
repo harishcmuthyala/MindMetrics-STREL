@@ -1,11 +1,12 @@
-# 🧠 MindMetrics — ML Stress Prediction on STREL
+# MindMetrics — ML Stress Prediction on STREL
 
 **Course:** CSCI 6838 – Spring 2026 Capstone  
 **Team:** Mind Metrics  
 
 Predicts binary mental-stress states (Stressed / Not-Stressed) for crisis
-leaders using the [STREL](https://osf.io/qshv7/) dataset and classical ML
-algorithms, with SVM implemented in PyTorch.
+leaders using the [STREL](https://osf.io/qshv7/) dataset. Perform
+data preprocessing and implements 4 ML algorithms: Logistic Regression,
+Random Forest, XGBoost, and SVM.
 
 ---
 
@@ -13,22 +14,23 @@ algorithms, with SVM implemented in PyTorch.
 
 ```
 MindMetrics-STREL/
-├── config/                  # Central config (paths, seeds, thresholds)
 ├── data/
-│   ├── raw/                 # Original CSV (gitignored — see Setup below)
-│   ├── processed/           # Per-fold train/test splits (generated)
-│   └── data_dictionary.md   # Full column-by-column documentation
-├── notebooks/               # EDA & prototyping notebooks
+│   ├── raw/                 # Original CSV (STREL_raw.csv)
+│   └── processed/           # Per-fold train/test splits
+├── docs/                    # Feature processing guide
+├── notebooks/
+│   ├── eda/                 # Exploratory data analysis
+│   └── prototyping/         # Model experiments (XGBoost+PyTorch hybrid)
 ├── src/
-│   ├── data/                # Load → missing → encode → scale
-│   ├── validation/          # Person-based CV splits + 6 metrics
-│   ├── models/              # LR, RF, XGBoost (sklearn) + SVM (PyTorch)
-│   ├── tuning/              # Hyperparameter search
-│   ├── evaluation/          # Comparison table, feature importance, plots
-│   └── pipeline.py          # End-to-end runner
-├── tests/                   # Unit tests (CV leakage, metrics, preprocessing)
-├── results/                 # Generated plots, tables, saved models
-├── docs/                    # Report, presentation, poster
+│   ├── data/                # Data preprocessing pipeline
+│   ├── validation/          # Person-based CV splits
+│   ├── models/              # Model implementations
+│   └── evaluation/          # Metrics and comparison
+├── results/
+│   ├── eda/                 # Feature analysis outputs
+│   ├── models/              # Saved trained models
+│   ├── plots/               # Visualizations
+│   └── metrics/             # Performance tables
 ├── requirements.txt
 └── README.md
 ```
@@ -60,20 +62,28 @@ pip install -r requirements.txt
 
 ## 🔬 Algorithms
 
-| Model              | Framework      | Owner |
-|--------------------|----------------|-------|
-| Logistic Regression| scikit-learn   | P1    |
-| Random Forest      | scikit-learn   | P2    |
-| XGBoost            | xgboost        | P3    |
-| SVM                | PyTorch        | P4    |
+| Model               |
+|---------------------|
+| Logistic Regression |
+| Random Forest       |
+| XGBoost             |
+| SVM                 |
+
 
 ---
 
-## 📊 Evaluation Metrics
+## 📊 Evaluation
 
-Accuracy · Precision · Recall · F1-Score · ROC-AUC · Specificity  
-Validated via **person-based 3-fold CV** (no participant appears in both
-train and test).
+**Metrics:** Accuracy · Precision · Recall · F1-Score · ROC-AUC · Specificity
+
+**Validation:** Person-based 3-fold CV using GroupKFold on Participant column
+(ensures no participant appears in both train and test sets).
+
+**Features:** 26 total — 5 physiological, 2 motion, 3 NASA-TLX, 4 Big Five
+personality, 3 demographic, 3 daily patterns, 4 categorical (encoded), 2
+temporal (Hour, Minute).
+
+**Target:** NHR_Stress (binary: S=1, NS=0)
 
 ---
 
@@ -82,5 +92,6 @@ train and test).
 - STREL Paper: *"STREL – Naturalistic Dataset and Methods for Studying
   Mental Stress and Relaxation Patterns in Critical Leading Roles"*,
   IEEE Transactions on Affective Computing, 2025.
+  https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=11185201
 - Dataset: https://github.com/UH-ACDC/STREL/blob/main/data/Activity_Stress_data_N24.csv
 - Original R code: https://github.com/UH-ACDC/STREL/

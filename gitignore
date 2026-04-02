@@ -1,6 +1,0 @@
-# Don't push generated results
-results/
-
-# Don't push Python cache files
-__pycache__/
-.ipynb_checkpoints/
