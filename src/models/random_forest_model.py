@@ -29,7 +29,7 @@ def train_and_evaluate_random_forest():
     print("STEP 1: Loading Data")
     print("=" * 60)
 
-    df = pd.read_excel("/Users/lahariappireddy/Downloads/processed.xlsx")
+    df = pd.read_excel("../../data/processed/processed.xlsx")
     print(f"Dataset shape: {df.shape}")
 
     # --------------------------------------------------
@@ -111,6 +111,7 @@ def train_and_evaluate_random_forest():
 
     fold_results = []
     total_tn, total_fp, total_fn, total_tp = 0, 0, 0, 0
+    fold_importances = []
 
     for fold, (train_idx, test_idx) in enumerate(gkf.split(X, y, groups=groups), start=1):
         print(f"\nFold {fold}")
@@ -119,6 +120,11 @@ def train_and_evaluate_random_forest():
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
 
         model.fit(X_train, y_train)
+
+        # Accumulate importances across folds
+        cat_feature_names = model.named_steps["preprocess"].named_transformers_["cat"].get_feature_names_out(cat_cols).tolist()
+        feature_names = cat_feature_names + num_cols
+        fold_importances.append(pd.Series(model.named_steps["rf"].feature_importances_, index=feature_names))
 
         y_pred = model.predict(X_test)
         y_prob = model.predict_proba(X_test)[:, 1]
@@ -176,6 +182,7 @@ def train_and_evaluate_random_forest():
         "tn": total_tn, "fp": total_fp, "fn": total_fn, "tp": total_tp,
         "fpr": fold_results[-1]["fpr"].tolist(), "tpr": fold_results[-1]["tpr"].tolist(),
         "fold_details": [{k: v for k, v in f.items() if k not in ("fpr", "tpr")} for f in fold_results],
+        "avg_feature_importances": pd.concat(fold_importances, axis=1).mean(axis=1).sort_values(ascending=False),
     }
 
 

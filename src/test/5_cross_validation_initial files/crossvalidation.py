@@ -9,14 +9,14 @@ from sklearn.model_selection import GroupKFold
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
     f1_score, roc_auc_score, confusion_matrix,
-    classification_report, roc_curve
+    classification_report
 )
 
 import warnings
 warnings.filterwarnings("ignore")
 
 
-def train_and_evaluate_random_forest():
+def random_forest_groupkfold_cv():
     """
     Train and evaluate Random Forest using 5-fold GroupKFold
     based on Participant column.
@@ -29,7 +29,7 @@ def train_and_evaluate_random_forest():
     print("STEP 1: Loading Data")
     print("=" * 60)
 
-    df = pd.read_excel("/Users/lahariappireddy/Downloads/processed.xlsx")
+    df = pd.read_excel("/Users/lahariappireddy/Downloads/train.xlsx")
     print(f"Dataset shape: {df.shape}")
 
     # --------------------------------------------------
@@ -110,7 +110,6 @@ def train_and_evaluate_random_forest():
     gkf = GroupKFold(n_splits=5)
 
     fold_results = []
-    total_tn, total_fp, total_fn, total_tp = 0, 0, 0, 0
 
     for fold, (train_idx, test_idx) in enumerate(gkf.split(X, y, groups=groups), start=1):
         print(f"\nFold {fold}")
@@ -134,10 +133,6 @@ def train_and_evaluate_random_forest():
         except ValueError:
             auc = np.nan
 
-        fpr, tpr, _ = roc_curve(y_test, y_prob)
-        tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
-        total_tn += tn; total_fp += fp; total_fn += fn; total_tp += tp
-
         print(f"Accuracy  : {acc:.4f}")
         print(f"Precision : {precision:.4f}")
         print(f"Recall    : {recall:.4f}")
@@ -145,10 +140,12 @@ def train_and_evaluate_random_forest():
         print(f"ROC-AUC   : {auc:.4f}" if not np.isnan(auc) else "ROC-AUC   : Not defined")
 
         fold_results.append({
-            "model": "Random Forest", "fold": fold,
-            "accuracy": acc, "precision": precision,
-            "recall": recall, "f1_score": f1, "roc_auc": auc,
-            "fpr": fpr, "tpr": tpr,
+            "fold": fold,
+            "accuracy": acc,
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1,
+            "roc_auc": auc
         })
 
     # --------------------------------------------------
@@ -160,7 +157,7 @@ def train_and_evaluate_random_forest():
 
     results_df = pd.DataFrame(fold_results)
 
-    print(results_df[['model', 'fold', 'accuracy', 'precision', 'recall', 'f1_score', 'roc_auc']])
+    print(results_df)
 
     print("\nAverage Performance:")
     print(f"Accuracy  : {results_df['accuracy'].mean():.4f}")
@@ -170,14 +167,15 @@ def train_and_evaluate_random_forest():
     print(f"ROC-AUC   : {results_df['roc_auc'].mean():.4f}")
 
     return {
-        "model_name": "Random Forest",
-        "accuracy": results_df["accuracy"].mean(), "precision": results_df["precision"].mean(),
-        "recall": results_df["recall"].mean(), "f1_score": results_df["f1_score"].mean(),
-        "tn": total_tn, "fp": total_fp, "fn": total_fn, "tp": total_tp,
-        "fpr": fold_results[-1]["fpr"].tolist(), "tpr": fold_results[-1]["tpr"].tolist(),
-        "fold_details": [{k: v for k, v in f.items() if k not in ("fpr", "tpr")} for f in fold_results],
+        "model_name": "Random Forest with GroupKFold",
+        "fold_results": fold_results,
+        "average_accuracy": results_df["accuracy"].mean(),
+        "average_precision": results_df["precision"].mean(),
+        "average_recall": results_df["recall"].mean(),
+        "average_f1_score": results_df["f1_score"].mean(),
+        "average_roc_auc": results_df["roc_auc"].mean()
     }
 
 
 if __name__ == "__main__":
-    train_and_evaluate_random_forest()
+    results = random_forest_groupkfold_cv()
