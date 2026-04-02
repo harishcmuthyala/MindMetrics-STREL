@@ -6,3 +6,6 @@ __pycache__/
 # Don't push IDE files
 .vscode/
 .idea/
+
+# Node
+node_modules/
