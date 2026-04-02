@@ -1,0 +1,8 @@
+# Don't push Python cache files
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Don't push IDE files
+.vscode/
+.idea/
