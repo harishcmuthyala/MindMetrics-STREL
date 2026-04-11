@@ -4,6 +4,9 @@ Compares multiple classification models using accuracy, precision, recall, F1-sc
 and ROC curves
 """
 
+import matplotlib
+matplotlib.use("Agg")  # Non-interactive backend — required when called from FastAPI
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -40,7 +43,7 @@ class ModelEvaluator:
         pd.DataFrame(self.all_fold_details).to_csv(filepath, index=False)
         print(f"Fold metrics saved to: {filepath}")
 
-    def plot_fold_accuracy(self, save_path=None):
+    def plot_fold_accuracy(self, save_path=None, show=True):
         """Plot accuracy per fold for each model as a point-line chart"""
         if not self.all_fold_details:
             print("No fold details available")
@@ -67,7 +70,10 @@ class ModelEvaluator:
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"Fold accuracy plot saved to: {save_path}")
-        plt.show()
+        if show:
+            plt.show()
+        else:
+            plt.close()
     
     def print_summary(self):
         """Print summary table of all model metrics"""
@@ -78,7 +84,7 @@ class ModelEvaluator:
         print(df[['Model','Accuracy','Precision','Recall','F1-Score']].to_string(index=False))
         print("=" * 80)
 
-    def plot_confusion_matrices(self, save_path=None):
+    def plot_confusion_matrices(self, save_path=None, show=True):
         """Plot confusion matrices for all models as heatmaps"""
         n = len(self.metrics)
         fig, axes = plt.subplots(1, n, figsize=(5 * n, 4))
@@ -98,9 +104,12 @@ class ModelEvaluator:
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"Confusion matrices saved to: {save_path}")
-        plt.show()
+        if show:
+            plt.show()
+        else:
+            plt.close()
     
-    def plot_metrics(self, save_path=None):
+    def plot_metrics(self, save_path=None, show=True):
         """
         Plot grouped bar charts comparing all metrics across models
         
@@ -133,9 +142,12 @@ class ModelEvaluator:
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"\nMetrics saved to: {save_path}")
-        plt.show()
+        if show:
+            plt.show()
+        else:
+            plt.close()
     
-    def plot_roc_curves(self, save_path=None):
+    def plot_roc_curves(self, save_path=None, show=True):
         """
         Plot ROC curves for all models on the same graph
         
@@ -165,7 +177,10 @@ class ModelEvaluator:
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"ROC curves saved to: {save_path}")
-        plt.show()
+        if show:
+            plt.show()
+        else:
+            plt.close()
     
     def save_metrics(self, filepath):
         """
@@ -181,49 +196,37 @@ class ModelEvaluator:
 # ─────────────────────────────────────────────
 # COMPARE MODELS
 # ─────────────────────────────────────────────
-if __name__ == "__main__":
+def run_all(selected_features: list = None):
     import sys
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'models'))
-    
-    evaluator = ModelEvaluator()
-    
-    # XGBoost
+
     from xg_boost_model import train_and_evaluate_xgboost
-    result = train_and_evaluate_xgboost()
-    evaluator.add_model(result['model_name'], result['accuracy'], result['precision'],
-        result['recall'], result['f1_score'], fpr=result['fpr'], tpr=result['tpr'],
-        tn=result['tn'], fp=result['fp'], fn=result['fn'], tp=result['tp'])
-    evaluator.add_fold_details(result['fold_details'])
-    
-    # Random Forest
     from random_forest_model import train_and_evaluate_random_forest
-    result = train_and_evaluate_random_forest()
-    evaluator.add_model(result['model_name'], result['accuracy'], result['precision'],
-        result['recall'], result['f1_score'], fpr=result['fpr'], tpr=result['tpr'],
-        tn=result['tn'], fp=result['fp'], fn=result['fn'], tp=result['tp'])
-    evaluator.add_fold_details(result['fold_details'])
-    
-    # SVM
     from svm_model import train_svm
-    result = train_svm()
-    evaluator.add_model(result['model_name'], result['accuracy'], result['precision'],
-        result['recall'], result['f1_score'], fpr=result['fpr'], tpr=result['tpr'],
-        tn=result['tn'], fp=result['fp'], fn=result['fn'], tp=result['tp'])
-    evaluator.add_fold_details(result['fold_details'])
-    
-    # Logistic Regression (PyTorch)
     from logreg_model import train_and_evaluate_logistic_regression
-    result = train_and_evaluate_logistic_regression()
-    evaluator.add_model(result['model_name'], result['accuracy'], result['precision'],
-        result['recall'], result['f1_score'], fpr=result['fpr'], tpr=result['tpr'],
-        tn=result['tn'], fp=result['fp'], fn=result['fn'], tp=result['tp'])
-    evaluator.add_fold_details(result['fold_details'])
-    
+
+    METRICS_DIR = os.path.join(os.path.dirname(__file__), '../../results/metrics')
+    show = selected_features is None  # show plots only when running standalone
+
+    evaluator = ModelEvaluator()
+
+    for fn in [train_and_evaluate_xgboost, train_and_evaluate_random_forest,
+               train_svm, train_and_evaluate_logistic_regression]:
+        result = fn(selected_features=selected_features)
+        evaluator.add_model(result['model_name'], result['accuracy'], result['precision'],
+            result['recall'], result['f1_score'], fpr=result['fpr'], tpr=result['tpr'],
+            tn=result['tn'], fp=result['fp'], fn=result['fn'], tp=result['tp'])
+        evaluator.add_fold_details(result['fold_details'])
+
     evaluator.print_summary()
-    evaluator.plot_confusion_matrices(save_path="../../results/metrics/confusion_matrices.png")
-    evaluator.plot_metrics(save_path="../../results/metrics/model_comparison.png")
-    evaluator.plot_roc_curves(save_path="../../results/metrics/roc_curves.png")
-    evaluator.save_metrics("../../results/metrics/model_metrics.csv")
-    evaluator.save_fold_metrics("../../results/metrics/fold_metrics.csv")
-    evaluator.plot_fold_accuracy(save_path="../../results/metrics/fold_accuracy.png")
+    evaluator.plot_confusion_matrices(save_path=f"{METRICS_DIR}/confusion_matrices.png", show=show)
+    evaluator.plot_metrics(save_path=f"{METRICS_DIR}/model_comparison.png", show=show)
+    evaluator.plot_roc_curves(save_path=f"{METRICS_DIR}/roc_curves.png", show=show)
+    evaluator.plot_fold_accuracy(save_path=f"{METRICS_DIR}/fold_accuracy.png", show=show)
+    evaluator.save_metrics(f"{METRICS_DIR}/model_metrics.csv")
+    evaluator.save_fold_metrics(f"{METRICS_DIR}/fold_metrics.csv")
+
+
+if __name__ == "__main__":
+    run_all()
