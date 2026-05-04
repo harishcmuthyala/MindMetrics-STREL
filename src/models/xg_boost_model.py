@@ -4,6 +4,7 @@ Trains XGBoost model and evaluates on test data
 Target: NHR_Stress (S = Stress, NS = No Stress)
 """
 
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import xgboost as xgb
@@ -22,8 +23,10 @@ warnings.filterwarnings("ignore")
 DROP_COLS = [
     "Participant", "PA_Activity", "SNS_Stress",  # ID and alternate labels
     "NHR_S", "NHR_NS", "NHR_0_2SD",              # Derived from NHR_Stress (leakage)
-    "SNS_S", "SNS_NS", "SNSindexThreshold"       # Derived from SNS_Stress (leakage)
+    "SNS_S", "SNS_NS", "SNSindexThreshold",      # Derived from SNS_Stress (leakage)
+    "HR", "HR_Baseline", "HR_Normalized"         # Correlated to NHR_Stress
 ]
+DATA_PATH = Path(__file__).resolve().parent / "../../data/processed/processed.xlsx"
 CAT_COLS = ["Day", "Period", "Profession", "Gender", "Activity4"]
 TARGET = "NHR_Stress"
 
@@ -64,7 +67,7 @@ def preprocess(df, scaler=None, train_cols=None, fit=True):
     return X, y, scaler, train_cols
 
 
-def train_and_evaluate_xgboost():
+def train_and_evaluate_xgboost(selected_features: list = None):
     """
     Train XGBoost model with 5-fold participant-based cross-validation.
     
@@ -79,8 +82,13 @@ def train_and_evaluate_xgboost():
     print("STEP 1: Loading Data")
     print("=" * 60)
 
-    df = pd.read_excel("../../data/processed/processed.xlsx")
+    df = pd.read_excel(DATA_PATH)
     print(f"Dataset shape: {df.shape}, Participants: {df['Participant'].nunique()}")
+
+    # Apply selected_features filter if provided (after DROP_COLS)
+    if selected_features:
+        keep = ["Participant", "NHR_Stress"] + [f for f in selected_features if f not in ["Participant", "NHR_Stress"]]
+        df = df[[c for c in keep if c in df.columns]]
 
     # ─────────────────────────────────────────────
     # 2. 5-FOLD CROSS-VALIDATION

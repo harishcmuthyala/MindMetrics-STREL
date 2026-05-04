@@ -1,0 +1,81 @@
+{
+  "categories": [
+    {
+      "label": "Temporal",
+      "features": ["Hour", "Minute"],
+      "tooltips": [
+        "Hour extracted from the session timestamp",
+        "Minute extracted from the session timestamp"
+      ]
+    },
+    {
+      "label": "Context",
+      "features": ["Day", "Period", "Profession"],
+      "tooltips": [
+        "Day type: Work Day 1 (WD1), Critical Day (CD), Work Day 2 (WD2), Non-work Day (ND)",
+        "Session period: Morning or Afternoon",
+        "Participant profession: Health Care Professional (HP) or Special Police (SP)"
+      ]
+    },
+    {
+      "label": "Demographics",
+      "features": ["Age", "Gender", "BMI"],
+      "tooltips": [
+        "Age of the participant in years",
+        "Gender of the participant: Male or Female",
+        "Body Mass Index - calculated value"
+      ]
+    },
+    {
+      "label": "Physiological",
+      "features": ["RR", "Cadence", "Speed", "PNSindex", "SNSindex", "Stressindex"],
+      "tooltips": [
+        "Heart rate variability signal in milliseconds, measured with Polar on the wrist",
+        "Cadence in cycles per minute (CPM), measured with Polar on the wrist",
+        "Movement speed in km/h, measured with Polar on the wrist",
+        "Parasympathetic Nervous System index - measures relaxation (rest & digest). Calculated with KUBIOS.",
+        "Sympathetic Nervous System index - measures stress (fight or flight). Calculated with KUBIOS.",
+        "Baevskii Stress Index - calculated with KUBIOS. Correlated with SNSindex."
+      ]
+    },
+    {
+      "label": "Activity",
+      "features": ["Activity4"],
+      "tooltips": [
+        "Activity label with manual intervention: Work, NonWork, or Driving"
+      ]
+    },
+    {
+      "label": "Sleep & Physical Activity",
+      "features": ["Sleep_Time", "PA_Percent", "PA_Intensity"],
+      "tooltips": [
+        "Sleep duration in hours from the previous night",
+        "Percentage of day spent in physical activity (Walking, Running, Biking)",
+        "Mean cadence during physical activities - indicates intensity level"
+      ]
+    },
+    {
+      "label": "NASA-TLX Workload",
+      "features": ["N_MD", "N_PD", "N_TD", "N_P", "N_E", "N_F"],
+      "tooltips": [
+        "Mental Demand: Perception of daily mental load. Score range 1-20.",
+        "Physical Demand: Perception of daily physical exertion. Score range 1-20.",
+        "Temporal Demand: Perception of daily time pressure. Score range 1-20.",
+        "Performance: Perception of success in executing daily tasks. Score range 1-20.",
+        "Effort: Perceived amount of work expended to achieve daily performance. Score range 1-20.",
+        "Frustration: Perceived level of irritation in performing daily tasks. Score range 1-20."
+      ]
+    },
+    {
+      "label": "Big Five Personality",
+      "features": ["Extraversion", "Agreeableness", "Conscientiousness", "Neuroticism", "Openness"],
+      "tooltips": [
+        "Level of outgoing nature of the participant. Score range 2-10.",
+        "Level of friendliness of the participant. Score range 2-10.",
+        "Level of organized nature of the participant. Score range 2-10.",
+        "Level of nervousness of the participant. Score range 2-10.",
+        "Level of curiosity of the participant. Score range 2-10."
+      ]
+    }
+  ]
+}

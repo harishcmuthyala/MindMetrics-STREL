@@ -30,7 +30,8 @@ GROUP_COL = "Participant"
 DROP_COLS = [
     "Participant", "PA_Activity", "SNS_Stress",  # ID and alternate labels
     "NHR_S", "NHR_NS", "NHR_0_2SD",              # Derived from NHR_Stress (leakage)
-    "SNS_S", "SNS_NS", "SNSindexThreshold"       # Derived from SNS_Stress (leakage)
+    "SNS_S", "SNS_NS", "SNSindexThreshold",      # Derived from SNS_Stress (leakage)
+    "HR", "HR_Baseline", "HR_Normalized"         # Correlated to NHR_Stress
 ]
 
 N_SPLITS = 5
@@ -145,8 +146,12 @@ def evaluate_model(model, X_val, y_val):
     return metrics
 
 
-def train_and_evaluate_logistic_regression():
+def train_and_evaluate_logistic_regression(selected_features: list = None):
     X, y, groups = load_data(DATA_PATH)
+
+    # Apply selected_features filter if provided (after DROP_COLS)
+    if selected_features:
+        X = X[[c for c in selected_features if c in X.columns]]
 
     print("Raw shape:", X.shape)
     print("Target counts:", y.value_counts().to_dict())

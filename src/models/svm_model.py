@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import warnings
@@ -14,12 +15,13 @@ from sklearn.metrics import (
 
 warnings.filterwarnings("ignore")
 
-DATA_PATH = "../../data/processed/processed.xlsx"
+DATA_PATH = Path(__file__).resolve().parent / "../../data/processed/processed.xlsx"
 
 DROP_COLS = [
     "PA_Activity", "SNS_Stress",
     "NHR_S", "NHR_NS", "NHR_0_2SD",
-    "SNS_S", "SNS_NS", "SNSindexThreshold"
+    "SNS_S", "SNS_NS", "SNSindexThreshold",
+    "HR", "HR_Baseline", "HR_Normalized"   # Correlated to NHR_Stress
 ]
 
 CAT_COLS = ["Day", "Period", "Profession", "Gender", "Activity4"]
@@ -61,10 +63,15 @@ def box(title):
     print(" " + "─" * BOX)
 
 
-def train_svm():
+def train_svm(selected_features: list = None):
     print("\nLoading Data\n" + "=" * BOX)
     df = pd.read_excel(DATA_PATH)
     df = df.dropna(subset=[TARGET, GROUP_COL]).copy()
+
+    # Apply selected_features filter if provided (after DROP_COLS)
+    if selected_features:
+        keep = [GROUP_COL, TARGET] + [f for f in selected_features if f not in [GROUP_COL, TARGET]]
+        df = df[[c for c in keep if c in df.columns]]
 
     y = encode_target(df)
     groups = df[GROUP_COL]

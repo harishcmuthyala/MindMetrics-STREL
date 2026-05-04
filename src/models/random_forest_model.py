@@ -1,3 +1,4 @@
+from pathlib import Path
 import pandas as pd
 import numpy as np
 
@@ -15,8 +16,10 @@ from sklearn.metrics import (
 import warnings
 warnings.filterwarnings("ignore")
 
+DATA_PATH = Path(__file__).resolve().parent / "../../data/processed/processed.xlsx"
 
-def train_and_evaluate_random_forest():
+
+def train_and_evaluate_random_forest(selected_features: list = None):
     """
     Train and evaluate Random Forest using 5-fold GroupKFold
     based on Participant column.
@@ -29,8 +32,13 @@ def train_and_evaluate_random_forest():
     print("STEP 1: Loading Data")
     print("=" * 60)
 
-    df = pd.read_excel("../../data/processed/processed.xlsx")
+    df = pd.read_excel(DATA_PATH)
     print(f"Dataset shape: {df.shape}")
+
+    # Apply selected_features filter if provided (after DROP_COLS)
+    if selected_features:
+        keep = ["Participant", "NHR_Stress"] + [f for f in selected_features if f not in ["Participant", "NHR_Stress"]]
+        df = df[[c for c in keep if c in df.columns]]
 
     # --------------------------------------------------
     # 2. DEFINE TARGET, GROUPS, DROP COLUMNS
@@ -44,7 +52,8 @@ def train_and_evaluate_random_forest():
     COLUMNS_TO_DROP = [
         "PA_Activity", "SNS_Stress",   # alternate labels
         "NHR_S", "NHR_NS", "NHR_0_2SD",
-        "SNS_S", "SNS_NS", "SNSindexThreshold"
+        "SNS_S", "SNS_NS", "SNSindexThreshold",
+        "HR", "HR_Baseline", "HR_Normalized"   # Correlated to NHR_Stress
     ]
 
     # Save Participant separately for grouping
